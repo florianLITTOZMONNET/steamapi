@@ -8,6 +8,10 @@ interface badgetoreturn{
   communityitemid?: string,
   scarcity: number
 }
+interface badgesort {
+  appid?: string,
+  badgeid: number
+}
 
 export const AssosiatecompletedBadgetoGame: (steamid: string)=> Promise<{[key: string]: badgetoreturn}> = async(steamid: string): Promise<{[key: string]: badgetoreturn}> => {
   const Library: LibraryStats = await GetLibrayUser(steamid);
@@ -28,4 +32,33 @@ export const AssosiatecompletedBadgetoGame: (steamid: string)=> Promise<{[key: s
     }
   }
   return res; 
+}
+
+export const rankbadge: (steamid: string)=> Promise<{[key: number]: badgesort}>= async(steamid: string): Promise<{[key: number]: badgesort}> => {
+  const Badgelist: GetBadgesResponse = await GetBadgeOwned(steamid);
+  const Library: LibraryStats = await GetLibrayUser(steamid);
+  const sortedBadges = Badgelist.badges.sort((a, b) => a.scarcity - b.scarcity);
+  let res: {[key: number]: badgesort} = {};
+  for (const badge of sortedBadges) {
+    res[badge.scarcity]= {
+      appid: badge.appid?.toString(),
+      badgeid: badge.badgeid,}
+    if (badge.appid !== undefined){
+      const gamename: string =assosiateidtogame(badge.appid, Library)
+      res[badge.scarcity]= {
+      appid: gamename,
+      badgeid: badge.badgeid,}
+    }
+  }
+  return res
+}
+
+const assosiateidtogame: (gameid: number, Library: LibraryStats) => string = (gameid: number, Library: LibraryStats): string => {
+  let res: string = gameid.toString();
+  for (const game of Library.games) {
+    if (game.appid == gameid){
+      res = game.name
+    }
+  }
+  return res;
 }

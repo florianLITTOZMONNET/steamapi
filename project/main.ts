@@ -1,12 +1,14 @@
 import {config} from '../config/configEnv';
-import { AssosiatecompletedBadgetoGame } from "./function/assosiationBadgeGame";
+import {rankbadge} from "./function/assosiationBadgeGame";
+import {steamid} from '../steamid';
 
-
-const temp = async(): Promise<void> => {
-  const temp = await AssosiatecompletedBadgetoGame(config.SteamId);
-  console.log(temp)
+const temp = async() => {
+  //const temp = await AssosiatecompletedBadgetoGame(config.SteamId);
+  const badge = await rankbadge(steamid.auteiltoa);
+  console.log(badge)
 }
 
 temp()
+
 //Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-//npx ts-node ./service/test.ts
+//npx ts-node ./project/main.ts

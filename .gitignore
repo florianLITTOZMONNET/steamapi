@@ -1,2 +1,5 @@
 .env
 node_modules/
+steamid.ts
+Idsteam.db
+folder/
