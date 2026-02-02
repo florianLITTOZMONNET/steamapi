@@ -1,0 +1,11 @@
+.env
+node_modules/
+my_steam_data.db
+playwright.config.ts
+web_handler/
+
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
