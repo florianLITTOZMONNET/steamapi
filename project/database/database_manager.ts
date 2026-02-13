@@ -11,7 +11,7 @@ import { Junc_P_B } from './junc_playbadg_data';
  * Steam players, games, badges, and their relationships.
  */
 export class SteamDatabaseManager {
-    private players: PlayersBDD;
+    public players: PlayersBDD;
     private games: GameBDD;
     private badges: badgeBDD;
     private playerGames: Junc_P_G;
@@ -32,8 +32,8 @@ export class SteamDatabaseManager {
     /**
      * Add a new player to the database
      */
-    addPlayer(id: string, username: string): boolean {
-        return this.players.addId(id, username);
+    addPlayer(id: string): boolean {
+        return this.players.addId(id);
     }
 
     /**
@@ -43,7 +43,7 @@ export class SteamDatabaseManager {
         if (ids.length !== usernames.length) {
             throw new Error('IDs and usernames arrays must have the same length');
         }
-        return this.players.addIds(ids, usernames);
+        return this.players.addIds(ids);
     }
 
     /**

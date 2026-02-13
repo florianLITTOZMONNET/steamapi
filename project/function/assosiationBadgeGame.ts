@@ -1,5 +1,5 @@
 import {LibraryStats, GetBadgesResponse} from "../contract";
-import {GetBadgeOwned} from "../service/getBadge";
+import {GetBadgeOwned} from "../service/getBadge.service";
 import {GetLibrayUser} from "../service/getLibrary.service";
 
 interface badgetoreturn{

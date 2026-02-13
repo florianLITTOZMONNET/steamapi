@@ -11,34 +11,39 @@ export class PlayersBDD extends Basedatabase
   {
     this.db.prepare(`
       CREATE TABLE IF NOT EXISTS PlayersIds (
-        id TEXT PRIMARY KEY,
-        username TEXT NOT NULL
+        id TEXT PRIMARY KEY
       )
     `).run();
   }
-  addId(id:string, name:string):boolean
+  addId(id:string):boolean
   {
     try{
-      this.db.prepare("INSERT INTO PlayersIds (id,username) VALUES (?,?)").run(id,name);
+      this.db.prepare("INSERT INTO PlayersIds (id) VALUES (?)").run(id);
       return true;
     }catch{return false;}
   }
 
-  addIds(ids: string[], names:string[]): number {
-    const insert = this.db.prepare("INSERT OR IGNORE INTO PlayersIds (id, username) VALUES (?,?)");
-    const insertMany = this.db.transaction((ids: string[], name:string[]) => {
+  addIds(ids: string[]): number {
+    const insert = this.db.prepare("INSERT OR IGNORE INTO PlayersIds (id) VALUES (?)");
+    const insertMany = this.db.transaction((ids: string[]) => {
       let count = 0;
       for(let i=0; i<ids.length;i++) {
-        count += insert.run(ids[i], name[i]).changes;
+        count += insert.run(ids[i]).changes;
       }
       return count;
     });
-    return insertMany(ids,names);
+    return insertMany(ids);
   }
 
   getPlayer(id: string): Player | null {
     const result = this.db.prepare('SELECT * FROM PlayersIds WHERE id = ?').get(id) as Player | undefined;
     return result || null;
+  }
+
+  getAll():string[]|null{
+    const rows = this.db.prepare('SELECT id FROM PlayersIds').all() as { id: string }[]
+    const ids = rows.map(r => r.id);
+    return ids;
   }
 
   deleteId(id: string): boolean {
