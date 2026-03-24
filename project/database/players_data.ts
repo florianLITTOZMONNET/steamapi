@@ -11,7 +11,9 @@ export class PlayersBDD extends Basedatabase
   {
     this.db.prepare(`
       CREATE TABLE IF NOT EXISTS PlayersIds (
-        id TEXT PRIMARY KEY
+        id TEXT PRIMARY KEY,
+        search BOOL DEFAULT 0,
+        time DATE DEFAULT NULL
       )
     `).run();
   }
@@ -44,6 +46,18 @@ export class PlayersBDD extends Basedatabase
     const rows = this.db.prepare('SELECT id FROM PlayersIds').all() as { id: string }[]
     const ids = rows.map(r => r.id);
     return ids;
+  }
+  searchedPlayers(id: string) {
+    this.db.prepare("UPDATE PlayersIds SET search=1, time=DATE('now') WHERE id = ?").run(id);
+  }
+
+  getUnsearchedPlayers(): Player[] | null {
+    const result = this.db.prepare('SELECT * FROM PlayersIds WHERE search=0').all() as Player[];
+    return result.length ? result : null;
+  }
+
+  updatePlayersSearch() {
+    this.db.prepare(`UPDATE PlayersIds SET search=0, time=NULL WHERE time <= DATE('now', '-4 months')`).run();
   }
 
   deleteId(id: string): boolean {

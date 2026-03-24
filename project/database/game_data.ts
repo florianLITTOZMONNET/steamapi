@@ -13,7 +13,9 @@ export class GameBDD extends Basedatabase
     this.db.prepare(`
       CREATE TABLE IF NOT EXISTS Games (
         id TEXT PRIMARY KEY,
-        name TEXT NOT NULL UNIQUE
+        name TEXT NOT NULL UNIQUE,
+        search BOOL DEFAULT 0,
+        time DATE DEFAULT NULL
       )
     `).run();
   }
@@ -50,6 +52,24 @@ export class GameBDD extends Basedatabase
     return result || null;
   }
 
+  searchedGame(id: string) {
+    this.db.prepare("UPDATE Games SET search=1, time=DATE('now') WHERE id = ?").run(id);
+  }
+
+  getUnsearchedGame(): Game[] | null {
+    const result = this.db.prepare('SELECT * FROM Games WHERE search=0').all() as Game[];
+    return result.length ? result : null;
+  }
+
+  updateGameSearch() {
+    this.db.prepare(`UPDATE Games SET search=0, time=NULL WHERE time <= DATE('now', '-4 months')`).run();
+  }
+
+  getAll():Game[]|null{
+    const res = this.db.prepare('SELECT * FROM Games').all() as Game[]|undefined;
+    return res||null;
+  }
+
   Deletegame(id:string): boolean
   {
     const res =this.db.prepare("DELETE FROM Games Where id = ?").run(id);
@@ -60,5 +80,15 @@ export class GameBDD extends Basedatabase
     this.db.prepare("DELETE FROM Games").run();
   }
 
+
+  getRandomGame(): Game | null {
+    const result = this.db.prepare('SELECT * FROM Games ORDER BY RANDOM() LIMIT 1').get() as Game | undefined;
+    return result || null;
+  }
+
+  getRandomUnsearchedGame(): Game | null {
+    const result = this.db.prepare('SELECT * FROM Games WHERE time IS NULL ORDER BY RANDOM() LIMIT 1').get() as Game | undefined;
+    return result || null;
+  }
 
 }

@@ -3,6 +3,7 @@ import { GameBDD } from './game_data';
 import { badgeBDD } from './badge_data';
 import { Junc_P_G } from './junc_playgam_data';
 import { Junc_P_B } from './junc_playbadg_data';
+import { Game, Player } from '../contract/i-BDD';
 
 /**
  * Steam Database Manager
@@ -11,7 +12,7 @@ import { Junc_P_B } from './junc_playbadg_data';
  * Steam players, games, badges, and their relationships.
  */
 export class SteamDatabaseManager {
-    public players: PlayersBDD;
+    private players: PlayersBDD;
     private games: GameBDD;
     private badges: badgeBDD;
     private playerGames: Junc_P_G;
@@ -46,6 +47,10 @@ export class SteamDatabaseManager {
         return this.players.addIds(ids);
     }
 
+    getAllPlayers():string[]|null{
+        return this.players.getAll();
+    }
+
     /**
      * Add a new game to the database
      */
@@ -61,6 +66,67 @@ export class SteamDatabaseManager {
             throw new Error('IDs and names arrays must have the same length');
         }
         return this.games.InsertManyGames(ids, names);
+    }
+
+    getAllGame():Game[]|null{
+        return this.games.getAll();
+    }
+
+    /**
+     * Get a random game from the database
+     */
+    getRandomGame(): Game | null {
+        return this.games.getRandomGame();
+    }
+
+    getRandomUnsearchedGame():Game|null{
+        return this.games.getRandomUnsearchedGame();
+    }
+
+    // ─── Player Search & Time ─────────────────────────────────────────────────
+
+    /**
+     * Mark a player as searched (sets search=1 and time=today)
+     */
+    markPlayerSearched(playerId: string): void {
+        this.players.searchedPlayers(playerId);
+    }
+
+    /**
+     * Get all players that have not been searched yet (search=0)
+     */
+    getUnsearchedPlayers(): Player[] | null {
+        return this.players.getUnsearchedPlayers();
+    }
+
+    /**
+     * Reset search flag for players whose last search was over 4 months ago
+     */
+    refreshPlayerSearchStatus(): void {
+        this.players.updatePlayersSearch();
+    }
+
+    // ─── Game Search & Time ───────────────────────────────────────────────────
+
+    /**
+     * Mark a game as searched (sets search=1 and time=today)
+     */
+    markGameSearched(gameId: string): void {
+        this.games.searchedGame(gameId);
+    }
+
+    /**
+     * Get all games that have not been searched yet (search=0)
+     */
+    getUnsearchedGames(): Game[] | null {
+        return this.games.getUnsearchedGame();
+    }
+
+    /**
+     * Reset search flag for games whose last search was over 4 months ago
+     */
+    refreshGameSearchStatus(): void {
+        this.games.updateGameSearch();
     }
 
     /**

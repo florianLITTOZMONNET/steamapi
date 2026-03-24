@@ -4,15 +4,15 @@ import { SteamDatabaseManager } from "./database_manager";
 
 
 
-export const populategamedata :()=>Promise<{[id: string]: string;}>=async():Promise<{[id: string]: string;}>=>{
+export const getGameFromPlayers :()=>Promise<{[id: string]: string;}>=async():Promise<{[id: string]: string;}>=>{
     const games:{[id:string]:string}={};
     const steamDB = new SteamDatabaseManager('my_steam_data.db');
-    const ids = steamDB.players.getAll();
+    const ids = steamDB.getAllPlayers();
     if(ids==null){
         console.log('no ids found');
         return games;
     }
-    console.log(`✓ Found ${ids.length} players in database:`);
+    //console.log(`✓ Found ${ids.length} players in database:`);
     ids.forEach((id, index) => {
         console.log(`  ${index + 1}. ${id}`);
     });
@@ -21,11 +21,30 @@ export const populategamedata :()=>Promise<{[id: string]: string;}>=async():Prom
       if(lib && lib.games) {
           lib.games.forEach(game => {
               games[game.appid.toString()] = game.name;
-              console.log(games[game.appid.toString()]);
+              //console.log(games[game.appid.toString()]);
           });
       } else {
           console.log(`  ⚠ No games found for player ${id}`);
       }
     }
-  return games;
+    steamDB.close();
+    return games;
+}
+
+
+export const populateGameData:()=>Promise<{[id: string]: string;}>=async():Promise<{[id: string]: string;}>=>{
+    const steamDB = new SteamDatabaseManager('my_steam_data.db');
+    const games = await getGameFromPlayers();
+    for(let game in games)
+    {
+        const added =steamDB.addGame(game, games[game]);
+        if(!added)
+        {console.log('couldn\'t add '+game+'  '+games[game]);}
+        else{
+            delete games[game];
+        }
+
+    }
+    steamDB.close();
+    return games
 }
